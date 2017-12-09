@@ -18,6 +18,7 @@ class Order extends Model
         foreach ($tickets as $ticket) {
             $order->tickets()->save($ticket);
         }
+
         return $order;
     }
 
