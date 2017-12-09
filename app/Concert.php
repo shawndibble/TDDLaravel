@@ -32,7 +32,6 @@ class Concert extends Model
 
     public function orders()
     {
-//        return $this->hasMany(Order::class);
         return $this->belongsToMany(Order::class, 'tickets');
     }
 
@@ -72,6 +71,12 @@ class Concert extends Model
         return $this->tickets()->available()->count();
     }
 
+    public function reserveTickets($quantity)
+    {
+        return $this->findTickets($quantity)->each(function ($ticket) {
+            $ticket->reserve();
+        });
+    }
     /**
      * @param $quantity
      * @return mixed
