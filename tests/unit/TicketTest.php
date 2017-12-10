@@ -1,14 +1,16 @@
 <?php
 
-use App\Concert;
 use App\Ticket;
+use App\Concert;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class TicketTest extends TestCase
 {
     use DatabaseMigrations;
-    
+
     /** @test */
     function a_ticket_can_be_reserved()
     {
@@ -25,7 +27,9 @@ class TicketTest extends TestCase
     {
         $ticket = factory(Ticket::class)->states('reserved')->create();
         $this->assertNotNull($ticket->reserved_at);
+
         $ticket->release();
+
         $this->assertNull($ticket->fresh()->reserved_at);
     }
 }

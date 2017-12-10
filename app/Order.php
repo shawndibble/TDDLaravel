@@ -22,14 +22,14 @@ class Order extends Model
         return $order;
     }
 
-    public function tickets()
-    {
-        return $this->hasMany(Ticket::class);
-    }
-
     public function concert()
     {
         return $this->belongsTo(Concert::class);
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 
     public function ticketQuantity()
@@ -42,8 +42,7 @@ class Order extends Model
         return [
             'email' => $this->email,
             'ticket_quantity' => $this->ticketQuantity(),
-            'amount' => $this->amount
+            'amount' => $this->amount,
         ];
     }
-
 }

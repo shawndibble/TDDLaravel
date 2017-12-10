@@ -1,10 +1,12 @@
 <?php
 
-use App\Billing\FakePaymentGateway;
+use App\Ticket;
 use App\Concert;
 use App\Reservation;
-use App\Ticket;
+use App\Billing\FakePaymentGateway;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ReservationTest extends TestCase
 {
@@ -25,23 +27,6 @@ class ReservationTest extends TestCase
     }
 
     /** @test */
-    function reserved_tickets_are_released_when_a_reservation_is_cancelled()
-    {
-        $tickets = collect([
-            Mockery::spy(Ticket::class),
-            Mockery::spy(Ticket::class),
-            Mockery::spy(Ticket::class),
-        ]);
-        $reservation = new Reservation($tickets, 'john@example.com');
-
-        $reservation->cancel();
-
-        foreach($tickets as $ticket) {
-            $ticket->shouldHaveRecieved('release');
-        }
-    }
-
-    /** @test */
     function retrieving_the_reservations_tickets()
     {
         $tickets = collect([
@@ -56,20 +41,38 @@ class ReservationTest extends TestCase
     }
 
     /** @test */
-    function retrieving_the_reservations_email()
+    function retrieving_the_customers_email()
     {
         $reservation = new Reservation(collect(), 'john@example.com');
+
         $this->assertEquals('john@example.com', $reservation->email());
+    }
+
+    /** @test */
+    function reserved_tickets_are_released_when_a_reservation_is_cancelled()
+    {
+        $tickets = collect([
+            Mockery::spy(Ticket::class),
+            Mockery::spy(Ticket::class),
+            Mockery::spy(Ticket::class),
+        ]);
+
+        $reservation = new Reservation($tickets, 'john@example.com');
+
+        $reservation->cancel();
+
+        foreach ($tickets as $ticket) {
+            $ticket->shouldHaveReceived('release');
+        }
     }
 
     /** @test */
     function completing_a_reservation()
     {
-        $concert = factory(Concert::class)->create(['ticket_price' => 1200])->addTickets(5);
+        $concert = factory(Concert::class)->create(['ticket_price' => 1200]);
         $tickets = factory(Ticket::class, 3)->create(['concert_id' => $concert->id]);
         $reservation = new Reservation($tickets, 'john@example.com');
         $paymentGateway = new FakePaymentGateway;
-
 
         $order = $reservation->complete($paymentGateway, $paymentGateway->getValidTestToken());
 

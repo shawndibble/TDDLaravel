@@ -1,17 +1,12 @@
 <?php
 
-use App\Concert;
 use App\Order;
-use App\Reservation;
 use App\Ticket;
+use App\Concert;
+use App\Reservation;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-
-/**
- * Created by PhpStorm.
- * User: Shawn
- * Date: 12/6/2017
- * Time: 7:26 PM
- */
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class OrderTest extends TestCase
 {

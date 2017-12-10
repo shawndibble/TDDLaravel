@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Billing;
 
 class FakePaymentGateway implements PaymentGateway
@@ -10,21 +11,22 @@ class FakePaymentGateway implements PaymentGateway
     {
         $this->charges = collect();
     }
+
     public function getValidTestToken()
     {
-        return 'valid-token';
+        return "valid-token";
     }
 
     public function charge($amount, $token)
     {
-        if($this->beforeFirstChargeCallback !== null)
-        {
+        if ($this->beforeFirstChargeCallback !== null) {
             $callback = $this->beforeFirstChargeCallback;
             $this->beforeFirstChargeCallback = null;
             $callback($this);
         }
-        if($token !== $this->getValidTestToken()) {
-            throw new PaymentFailedException();
+
+        if ($token !== $this->getValidTestToken()) {
+            throw new PaymentFailedException;
         }
         $this->charges[] = $amount;
     }

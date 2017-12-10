@@ -1,7 +1,6 @@
 <?php
 
 use App\Exceptions\Handler;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 
 abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
@@ -11,7 +10,7 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
      *
      * @var string
      */
-    protected $baseUrl = 'http://homestead.app';
+    protected $baseUrl = 'http://localhost';
 
     /**
      * Creates the application.
@@ -32,9 +31,8 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
         $this->app->instance(ExceptionHandler::class, new class extends Handler {
             public function __construct() {}
             public function report(Exception $e) {}
-            public function render($request, Exception $exception)
-            {
-                throw $exception;
+            public function render($request, Exception $e) {
+                throw $e;
             }
         });
     }
