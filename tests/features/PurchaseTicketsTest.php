@@ -11,6 +11,8 @@ class PurchaseTicketsTest extends TestCase
 {
     use DatabaseMigrations;
 
+    private $response;
+
     protected function setUp()
     {
         parent::setUp();
@@ -21,14 +23,19 @@ class PurchaseTicketsTest extends TestCase
     private function orderTickets($concert, $params)
     {
         $savedRequest = $this->app['request'];
-        $this->json('POST', "/concerts/{$concert->id}/orders", $params);
+        $this->response = $this->json('POST', "/concerts/{$concert->id}/orders", $params);
         $this->app['request'] = $savedRequest;
+    }
+
+    private function assertResponseStatus($status)
+    {
+        $this->response->assertStatus($status);
     }
 
     private function assertValidationError($field)
     {
         $this->assertResponseStatus(422);
-        $this->assertArrayHasKey($field, $this->decodeResponseJson());
+        $this->assertArrayHasKey($field, $this->response->decodeResponseJson());
     }
 
     /** @test */
@@ -45,7 +52,7 @@ class PurchaseTicketsTest extends TestCase
 
         $this->assertResponseStatus(201);
 
-        $this->seeJsonSubset([
+        $this->response->assertJson([
             'email' => 'john@example.com',
             'ticket_quantity' => 3,
             'amount' => 9750,
