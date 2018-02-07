@@ -5,7 +5,7 @@ namespace App;
 class Reservation
 {
     private $tickets;
-    private $email;
+    public $email;
 
     public function __construct($tickets, $email)
     {
@@ -30,9 +30,9 @@ class Reservation
 
     public function complete($paymentGateway, $paymentToken)
     {
-        $paymentGateway->charge($this->totalCost(), $paymentToken);
+        $charge = $paymentGateway->charge($this->totalCost(), $paymentToken);
 
-        return Order::forTickets($this->tickets(), $this->email(), $this->totalCost());
+        return Order::forTickets($this->tickets(), $this->email(), $charge);
     }
 
     public function cancel()

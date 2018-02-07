@@ -12,6 +12,7 @@ use App\Billing\PaymentFailedException;
 trait PaymentGatewayContractTests
 {
     abstract protected function getPaymentGateway();
+    
     /** @test */
     function charges_with_a_valid_payment_token_are_successful()
     {
@@ -22,7 +23,19 @@ trait PaymentGatewayContractTests
         });
 
         $this->assertCount(1, $newCharges);
-        $this->assertEquals(2500, $newCharges->sum());
+        $this->assertEquals(2500, $newCharges->map->amount()->sum());
+    }
+    
+    /** @test */
+    function can_get_details_about_a_successful_charge()
+    {
+        $paymentGateway = $this->getPaymentGateway();
+
+        $charge = $paymentGateway->charge(2500, $paymentGateway->getValidTestToken($paymentGateway::TEST_CARD_NUMBER));
+
+        $this->assertEquals(substr($paymentGateway::TEST_CARD_NUMBER, -4), $charge->cardLastFour());
+        $this->assertEquals(2500, $charge->amount());
+
     }
 
     /** @test */
@@ -37,7 +50,7 @@ trait PaymentGatewayContractTests
             $paymentGateway->charge(5000, $paymentGateway->getValidTestToken());
         });
         $this->assertCount(2, $newCharges);
-        $this->assertEquals([5000, 4000], $newCharges->all());
+        $this->assertEquals([5000, 4000], $newCharges->map->amount()->all());
     }
 
     /** @test */
